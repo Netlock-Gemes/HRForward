@@ -33,8 +33,7 @@ async def _copy_with_retry(
 
         except FloodWait as e:
             log.warning(
-                "FloodWait: sleeping %ss "
-                "(attempt %s/%s) for destination %s",
+                "FloodWait: sleeping %ss (attempt %s/%s) for destination %s",
                 e.value,
                 attempt,
                 MAX_RETRIES,
@@ -45,8 +44,7 @@ async def _copy_with_retry(
 
         except RPCError as e:
             log.error(
-                "RPC error on attempt %s/%s "
-                "for message %s -> %s: %s",
+                "RPC error on attempt %s/%s for message %s -> %s: %s",
                 attempt,
                 MAX_RETRIES,
                 message.id,
@@ -55,9 +53,7 @@ async def _copy_with_retry(
             )
 
             if attempt < MAX_RETRIES:
-                await asyncio.sleep(
-                    RETRY_BACKOFF_SECONDS * attempt
-                )
+                await asyncio.sleep(RETRY_BACKOFF_SECONDS * attempt)
 
         except Exception:
             log.exception(
@@ -105,10 +101,7 @@ async def _forward_message(
         return_exceptions=True,
     )
 
-    successful = sum(
-        result is True
-        for result in results
-    )
+    successful = sum(result is True for result in results)
 
     failed = len(results) - successful
 
@@ -121,8 +114,7 @@ async def _forward_message(
         )
     else:
         log.info(
-            "Message %s forwarded successfully "
-            "to all %s destination(s)",
+            "Message %s forwarded successfully to all %s destination(s)",
             message.id,
             successful,
         )
@@ -140,10 +132,7 @@ def build_client(
         in_memory=True,
     )
 
-    @app.on_message(
-        (filters.video | filters.document)
-        & ~filters.outgoing
-    )
+    @app.on_message(filters.video | filters.document)
     async def _on_message(
         client,
         message,
@@ -153,9 +142,7 @@ def build_client(
 
         source_id = message.chat.id
 
-        route = await database.get_route_for_source(
-            source_id
-        )
+        route = await database.get_route_for_source(source_id)
 
         if route is None:
             return
@@ -167,8 +154,7 @@ def build_client(
         )
 
         log.info(
-            "Message %s from source %s matched route '%s' "
-            "(delay: %ss)",
+            "Message %s from source %s matched route '%s' (delay: %ss)",
             message.id,
             source_id,
             route["name"],
