@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#f7f8fa">
+
+    <title>Sign in — Telegram Forwarder</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+</head>
+
+<body class="login-page">
+
+<div class="login-shell">
+
+    <!-- Decorative background -->
+    <div class="login-grid"></div>
+
+    <main class="login-card">
+
+        <div class="login-brand">
+
+            <div class="brand-mark large">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                        d="M21.5 4.5 18.2 19c-.25 1.03-.84 1.29-1.7.8l-4.65-3.43-2.24 2.16c-.25.25-.46.46-.94.46l.34-4.74 8.63-7.8c.38-.34-.08-.53-.59-.19L6.39 13.04 1.82 11.61c-.99-.31-1.01-.99.2-1.46L19.88 3.1c.84-.31 1.58.19 1.62 1.4Z"
+                        fill="currentColor"
+                    />
+                </svg>
+            </div>
+
+            <div>
+                <div class="brand-name">Forwarder</div>
+                <div class="brand-subtitle">Telegram Control</div>
+            </div>
+
+        </div>
+
+
+        <div class="login-heading">
+
+            <div class="eyebrow">
+                Secure workspace
+            </div>
+
+            <h1>Welcome back</h1>
+
+            <p>
+                Sign in to manage your Telegram forwarding routes.
+            </p>
+
+        </div>
+
+
+        {% if error %}
+
+            <div class="login-error" role="alert">
+
+                <div class="error-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 9v4"/>
+                        <path d="M12 17h.01"/>
+                        <path d="M10.3 4.8 3.8 17a2 2 0 0 0 1.8 3h12.8a2 2 0 0 0 1.8-3l-6.5-12.2a2 2 0 0 0-3.4 0Z"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <strong>Sign in failed</strong>
+                    <span>{{ error }}</span>
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+        <form method="post" action="/login" class="login-form">
+
+            <div class="form-field">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <div class="login-input">
+
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20 21a8 8 0 0 0-16 0"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+
+                    <input
+                        id="username"
+                        type="text"
+                        name="username"
+                        autocomplete="username"
+                        placeholder="Enter your username"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-field">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="login-input">
+
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="4" y="10" width="16" height="10" rx="2"/>
+                        <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                    </svg>
+
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        autocomplete="current-password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <button type="submit" class="login-submit">
+
+                <span>Sign in to dashboard</span>
+
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h13"/>
+                    <path d="m13 6 6 6-6 6"/>
+                </svg>
+
+            </button>
+
+        </form>
+
+
+        <div class="login-security">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 5 6v5c0 4.5 2.9 8.5 7 10 4.1-1.5 7-5.5 7-10V6l-7-3Z"/>
+                <path d="m9 12 2 2 4-4"/>
+            </svg>
+
+            <span>Protected admin workspace</span>
+
+        </div>
+
+    </main>
+
+
+    <div class="login-footer">
+        Telegram Forwarder
+        <span></span>
+        Secure Control Center
+    </div>
+
+</div>
+
+</body>
+</html>

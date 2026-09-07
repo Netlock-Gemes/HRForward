@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#f7f8fa">
+
+    <title>Dashboard — Telegram Forwarder</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                        d="M21.5 4.5 18.2 19c-.25 1.03-.84 1.29-1.7.8l-4.65-3.43-2.24 2.16c-.25.25-.46.46-.94.46l.34-4.74 8.63-7.8c.38-.34-.08-.53-.59-.19L6.39 13.04 1.82 11.61c-.99-.31-1.01-.99.2-1.46L19.88 3.1c.84-.31 1.58.19 1.62 1.4Z"
+                        fill="currentColor"
+                    />
+                </svg>
+            </div>
+
+            <div>
+                <div class="brand-name">Forwarder</div>
+                <div class="brand-subtitle">Telegram Control</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-label">Workspace</div>
+
+            <a href="/" class="nav-item active">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                </svg>
+                <span>Routes</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <div>
+                    <strong>System online</strong>
+                    <span>Forwarder is running</span>
+                </div>
+            </div>
+
+            <a href="/logout" class="logout-link">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 4H5.8A1.8 1.8 0 0 0 4 5.8v12.4A1.8 1.8 0 0 0 5.8 20H9"/>
+                    <path d="M14 8l4 4-4 4"/>
+                    <path d="M18 12H9"/>
+                </svg>
+                Sign out
+            </a>
+        </div>
+
+    </aside>
+
+
+    <!-- Main -->
+    <main class="main-content">
+
+        <!-- Mobile topbar -->
+        <header class="mobile-header">
+            <div class="brand">
+                <div class="brand-mark">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path
+                            d="M21.5 4.5 18.2 19c-.25 1.03-.84 1.29-1.7.8l-4.65-3.43-2.24 2.16c-.25.25-.46.46-.94.46l.34-4.74 8.63-7.8c.38-.34-.08-.53-.59-.19L6.39 13.04 1.82 11.61c-.99-.31-1.01-.99.2-1.46L19.88 3.1c.84-.31 1.58.19 1.62 1.4Z"
+                            fill="currentColor"
+                        />
+                    </svg>
+                </div>
+
+                <div>
+                    <div class="brand-name">Forwarder</div>
+                </div>
+            </div>
+
+            <a href="/logout" class="icon-button" aria-label="Sign out">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 4H5.8A1.8 1.8 0 0 0 4 5.8v12.4A1.8 1.8 0 0 0 5.8 20H9"/>
+                    <path d="M14 8l4 4-4 4"/>
+                    <path d="M18 12H9"/>
+                </svg>
+            </a>
+        </header>
+
+
+        <div class="page-container">
+
+            <!-- Page heading -->
+            <section class="page-heading">
+
+                <div>
+                    <div class="eyebrow">
+                        <span class="eyebrow-line"></span>
+                        Workspace
+                    </div>
+
+                    <h1>Forwarding routes</h1>
+
+                    <p>
+                        Manage how messages, videos and files move between
+                        your Telegram channels.
+                    </p>
+                </div>
+
+                <a href="#add-route" class="primary-button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 5v14"/>
+                        <path d="M5 12h14"/>
+                    </svg>
+                    Add route
+                </a>
+
+            </section>
+
+
+            <!-- Stats -->
+            {% set total_routes = routes|length %}
+            {% set active_routes = routes|selectattr("enabled")|list|length %}
+            {% set disabled_routes = total_routes - active_routes %}
+
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon neutral">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5v-11Z"/>
+                            <path d="M8 8h8M8 12h8M8 16h5"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="stat-value">{{ total_routes }}</span>
+                        <span class="stat-label">Total routes</span>
+                    </div>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m5 12 4 4L19 6"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="stat-value">{{ active_routes }}</span>
+                        <span class="stat-label">Active routes</span>
+                    </div>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-icon muted-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6 6l12 12"/>
+                            <path d="M18 6 6 18"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <span class="stat-value">{{ disabled_routes }}</span>
+                        <span class="stat-label">Disabled routes</span>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- Routes -->
+            <section class="content-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Your routes</h2>
+                        <p>
+                            Each route defines where content comes from
+                            and where it should be forwarded.
+                        </p>
+                    </div>
+
+                    {% if routes %}
+                        <span class="route-count">
+                            {{ total_routes }}
+                            {% if total_routes == 1 %}route{% else %}routes{% endif %}
+                        </span>
+                    {% endif %}
+                </div>
+
+
+                {% if routes %}
+
+                    <div class="routes-list">
+
+                        {% for route in routes %}
+
+                            <article class="route-card {% if not route.enabled %}is-disabled{% endif %}">
+
+                                <!-- Route header -->
+                                <div class="route-card-header">
+
+                                    <div class="route-title-area">
+
+                                        <div class="route-avatar">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-13Z"/>
+                                                <path d="m8 12 2.5 2.5L16 9"/>
+                                            </svg>
+                                        </div>
+
+                                        <div>
+                                            <div class="route-name-row">
+                                                <h3>{{ route.name }}</h3>
+
+                                                {% if route.enabled %}
+                                                    <span class="status-badge active">
+                                                        <span></span>
+                                                        Active
+                                                    </span>
+                                                {% else %}
+                                                    <span class="status-badge disabled">
+                                                        <span></span>
+                                                        Disabled
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+
+                                            <p class="route-id">
+                                                Route ID · {{ route._id }}
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="route-actions">
+
+                                        <form
+                                            method="post"
+                                            action="/routes/{{ route._id }}/toggle"
+                                        >
+                                            <button
+                                                type="submit"
+                                                class="small-button secondary-button"
+                                            >
+                                                {% if route.enabled %}
+                                                    Disable
+                                                {% else %}
+                                                    Enable
+                                                {% endif %}
+                                            </button>
+                                        </form>
+
+                                        <form
+                                            method="post"
+                                            action="/routes/{{ route._id }}/delete"
+                                            onsubmit="return confirm('Delete this route?')"
+                                        >
+                                            <button
+                                                type="submit"
+                                                class="small-button danger-button"
+                                                aria-label="Delete route"
+                                            >
+                                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M4 7h16"/>
+                                                    <path d="M10 11v6M14 11v6"/>
+                                                    <path d="M6 7l1 13h10l1-13"/>
+                                                    <path d="M9 7V4h6v3"/>
+                                                </svg>
+                                                Delete
+                                            </button>
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Route flow -->
+                                <div class="route-flow">
+
+                                    <div class="endpoint">
+
+                                        <div class="endpoint-label">
+                                            <span class="endpoint-number">01</span>
+                                            Sources
+                                        </div>
+
+                                        <div class="endpoint-box">
+
+                                            {% for source in route.sources %}
+                                                <div class="channel-id">
+                                                    <span class="channel-dot"></span>
+                                                    <code>{{ source }}</code>
+                                                </div>
+                                            {% endfor %}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="flow-arrow">
+                                        <span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M5 12h13"/>
+                                                <path d="m13 6 6 6-6 6"/>
+                                            </svg>
+                                        </span>
+                                    </div>
+
+
+                                    <div class="endpoint">
+
+                                        <div class="endpoint-label">
+                                            <span class="endpoint-number">02</span>
+                                            Destinations
+                                        </div>
+
+                                        <div class="endpoint-box">
+
+                                            {% for destination in route.destinations %}
+                                                <div class="channel-id">
+                                                    <span class="channel-dot destination"></span>
+                                                    <code>{{ destination }}</code>
+                                                </div>
+                                            {% endfor %}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Route metadata -->
+                                <div class="route-meta">
+
+                                    <div class="meta-item">
+
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="8"/>
+                                            <path d="M12 8v4l2.5 2"/>
+                                        </svg>
+
+                                        <div>
+                                            <span>Forward delay</span>
+                                            <strong>
+                                                {{ route.get("delay_seconds", 0) }}
+                                                second{% if route.get("delay_seconds", 0) != 1 %}s{% endif %}
+                                            </strong>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="meta-divider"></div>
+
+                                    <div class="meta-item">
+
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M5 12h14"/>
+                                            <path d="m13 6 6 6-6 6"/>
+                                        </svg>
+
+                                        <div>
+                                            <span>Flow</span>
+                                            <strong>
+                                                {{ route.sources|length }}
+                                                source{% if route.sources|length != 1 %}s{% endif %}
+                                                →
+                                                {{ route.destinations|length }}
+                                                destination{% if route.destinations|length != 1 %}s{% endif %}
+                                            </strong>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Editor -->
+                                <details class="route-editor">
+
+                                    <summary>
+                                        <span class="edit-summary-left">
+                                            <span class="edit-icon">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path d="M12 20h9"/>
+                                                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+                                                </svg>
+                                            </span>
+                                            Edit route
+                                        </span>
+
+                                        <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="m6 9 6 6 6-6"/>
+                                        </svg>
+                                    </summary>
+
+
+                                    <div class="editor-content">
+
+                                        <div class="editor-heading">
+                                            <div>
+                                                <h4>Edit configuration</h4>
+                                                <p>
+                                                    Update this route without changing
+                                                    its current active state.
+                                                </p>
+                                            </div>
+                                        </div>
+
+
+                                        <form
+                                            method="post"
+                                            action="/routes/{{ route._id }}/update"
+                                            class="route-form"
+                                        >
+
+                                            <div class="form-field full-width">
+
+                                                <label for="route-name-{{ route._id }}">
+                                                    Route name
+                                                </label>
+
+                                                <input
+                                                    id="route-name-{{ route._id }}"
+                                                    type="text"
+                                                    name="name"
+                                                    value="{{ route.name }}"
+                                                    required
+                                                >
+
+                                            </div>
+
+
+                                            <div class="form-grid">
+
+                                                <div class="form-field">
+
+                                                    <label for="route-sources-{{ route._id }}">
+                                                        Sources
+                                                    </label>
+
+                                                    <input
+                                                        id="route-sources-{{ route._id }}"
+                                                        type="text"
+                                                        name="sources"
+                                                        value="{{ route.sources | join(', ') }}"
+                                                        required
+                                                    >
+
+                                                    <span class="field-help">
+                                                        Separate multiple IDs with commas.
+                                                    </span>
+
+                                                </div>
+
+
+                                                <div class="form-field">
+
+                                                    <label for="route-destinations-{{ route._id }}">
+                                                        Destinations
+                                                    </label>
+
+                                                    <input
+                                                        id="route-destinations-{{ route._id }}"
+                                                        type="text"
+                                                        name="destinations"
+                                                        value="{{ route.destinations | join(', ') }}"
+                                                        required
+                                                    >
+
+                                                    <span class="field-help">
+                                                        Separate multiple IDs with commas.
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="form-field delay-field">
+
+                                                <label for="route-delay-{{ route._id }}">
+                                                    Forward delay
+                                                </label>
+
+                                                <div class="input-suffix">
+                                                    <input
+                                                        id="route-delay-{{ route._id }}"
+                                                        type="number"
+                                                        name="delay_seconds"
+                                                        value="{{ route.get('delay_seconds', 0) }}"
+                                                        min="0"
+                                                        step="1"
+                                                        required
+                                                    >
+                                                    <span>seconds</span>
+                                                </div>
+
+                                                <span class="field-help">
+                                                    Set to 0 to forward immediately.
+                                                </span>
+
+                                            </div>
+
+
+                                            <div class="editor-actions">
+                                                <button
+                                                    type="submit"
+                                                    class="primary-button"
+                                                >
+                                                    Save changes
+                                                </button>
+                                            </div>
+
+                                        </form>
+
+                                    </div>
+
+                                </details>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/>
+                                <path d="M8 9h8M8 13h5"/>
+                            </svg>
+                        </div>
+
+                        <h3>No routes yet</h3>
+
+                        <p>
+                            Create your first forwarding route to start
+                            moving content between Telegram channels.
+                        </p>
+
+                        <a href="#add-route" class="primary-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 5v14"/>
+                                <path d="M5 12h14"/>
+                            </svg>
+                            Create your first route
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- Add route -->
+            <section class="create-section" id="add-route">
+
+                <div class="create-header">
+
+                    <div class="create-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 5v14"/>
+                            <path d="M5 12h14"/>
+                        </svg>
+                    </div>
+
+                    <div>
+                        <div class="eyebrow">
+                            Configuration
+                        </div>
+
+                        <h2>Create forwarding route</h2>
+
+                        <p>
+                            Define a source, one or more destinations,
+                            and an optional forwarding delay.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="post"
+                    action="/routes"
+                    class="route-form create-form"
+                >
+
+                    <div class="form-field full-width">
+
+                        <label for="new-route-name">
+                            Route name
+                        </label>
+
+                        <input
+                            id="new-route-name"
+                            type="text"
+                            name="name"
+                            placeholder="e.g. Movies"
+                            required
+                        >
+
+                        <span class="field-help">
+                            Give this route a short, recognizable name.
+                        </span>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <div class="form-field">
+
+                            <label for="new-route-sources">
+                                Sources
+                            </label>
+
+                            <input
+                                id="new-route-sources"
+                                type="text"
+                                name="sources"
+                                placeholder="-1001234567890, -1009876543210"
+                                required
+                            >
+
+                            <span class="field-help">
+                                Telegram channel IDs. Separate multiple IDs with commas.
+                            </span>
+
+                        </div>
+
+
+                        <div class="form-field">
+
+                            <label for="new-route-destinations">
+                                Destinations
+                            </label>
+
+                            <input
+                                id="new-route-destinations"
+                                type="text"
+                                name="destinations"
+                                placeholder="-1005555555555, -1006666666666"
+                                required
+                            >
+
+                            <span class="field-help">
+                                Where matching content should be forwarded.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-field delay-field">
+
+                        <label for="new-route-delay">
+                            Forward delay
+                        </label>
+
+                        <div class="input-suffix">
+                            <input
+                                id="new-route-delay"
+                                type="number"
+                                name="delay_seconds"
+                                value="0"
+                                min="0"
+                                step="1"
+                                required
+                            >
+                            <span>seconds</span>
+                        </div>
+
+                        <span class="field-help">
+                            Set 0 to forward content immediately.
+                        </span>
+
+                    </div>
+
+
+                    <div class="create-form-footer">
+
+                        <div class="security-note">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 3 5 6v5c0 4.5 2.9 8.5 7 10 4.1-1.5 7-5.5 7-10V6l-7-3Z"/>
+                                <path d="m9 12 2 2 4-4"/>
+                            </svg>
+
+                            <span>
+                                Changes are applied by the forwarding service.
+                            </span>
+                        </div>
+
+                        <button type="submit" class="primary-button">
+                            Create route
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 12h13"/>
+                                <path d="m13 6 6 6-6 6"/>
+                            </svg>
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <footer class="page-footer">
+                <span>Telegram Forwarder</span>
+                <span class="footer-dot"></span>
+                <span>Control Center</span>
+            </footer>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

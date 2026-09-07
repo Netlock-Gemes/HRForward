@@ -21,6 +21,7 @@ ENV PATH="/venv/bin:$PATH"
 WORKDIR /app
 
 COPY app ./app
-COPY routes.json ./routes.json
+COPY templates ./templates
+COPY static ./static
 
 CMD ["python", "-m", "app.main"]
