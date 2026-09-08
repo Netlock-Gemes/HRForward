@@ -10,7 +10,9 @@ from fastapi.responses import (
 
 from .auth import authenticate, logout, require_auth
 from .config import Config
-from .database import Database
+from .database import CAPTION_DEFAULTS, Database
+
+VALID_CAPTION_MODES = {"original", "filename", "none"}
 
 
 def create_router(
@@ -91,6 +93,10 @@ def create_router(
         sources: str = Form(...),
         destinations: str = Form(...),
         delay_seconds: int = Form(0),
+        caption_mode: str = Form(CAPTION_DEFAULTS["caption_mode"]),
+        clean_filename: bool = Form(CAPTION_DEFAULTS["clean_filename"]),
+        remove_text: str = Form(CAPTION_DEFAULTS["remove_text"]),
+        keep_extension: bool = Form(CAPTION_DEFAULTS["keep_extension"]),
     ):
         redirect = require_auth(request)
 
@@ -103,6 +109,8 @@ def create_router(
         # Prevent invalid negative delays.
         delay_seconds = max(0, delay_seconds)
 
+        caption_mode = _normalize_caption_mode(caption_mode)
+
         if not source_list or not destination_list:
             return RedirectResponse(
                 "/",
@@ -114,6 +122,10 @@ def create_router(
             sources=source_list,
             destinations=destination_list,
             delay_seconds=delay_seconds,
+            caption_mode=caption_mode,
+            clean_filename=clean_filename,
+            remove_text=remove_text.strip(),
+            keep_extension=keep_extension,
         )
 
         return RedirectResponse(
@@ -131,6 +143,10 @@ def create_router(
         sources: str = Form(...),
         destinations: str = Form(...),
         delay_seconds: int = Form(0),
+        caption_mode: str = Form(CAPTION_DEFAULTS["caption_mode"]),
+        clean_filename: bool = Form(CAPTION_DEFAULTS["clean_filename"]),
+        remove_text: str = Form(CAPTION_DEFAULTS["remove_text"]),
+        keep_extension: bool = Form(CAPTION_DEFAULTS["keep_extension"]),
     ):
         redirect = require_auth(request)
 
@@ -142,6 +158,8 @@ def create_router(
 
         # Prevent invalid negative delays.
         delay_seconds = max(0, delay_seconds)
+
+        caption_mode = _normalize_caption_mode(caption_mode)
 
         if not source_list or not destination_list:
             return RedirectResponse(
@@ -168,6 +186,10 @@ def create_router(
                 destinations=destination_list,
                 delay_seconds=delay_seconds,
                 enabled=route["enabled"],
+                caption_mode=caption_mode,
+                clean_filename=clean_filename,
+                remove_text=remove_text.strip(),
+                keep_extension=keep_extension,
             )
 
         return RedirectResponse(
@@ -228,6 +250,22 @@ def create_router(
                     0,
                 ),
                 enabled=not route["enabled"],
+                caption_mode=route.get(
+                    "caption_mode",
+                    CAPTION_DEFAULTS["caption_mode"],
+                ),
+                clean_filename=route.get(
+                    "clean_filename",
+                    CAPTION_DEFAULTS["clean_filename"],
+                ),
+                remove_text=route.get(
+                    "remove_text",
+                    CAPTION_DEFAULTS["remove_text"],
+                ),
+                keep_extension=route.get(
+                    "keep_extension",
+                    CAPTION_DEFAULTS["keep_extension"],
+                ),
             )
 
         return RedirectResponse(
@@ -247,6 +285,15 @@ def create_router(
         )
 
     return router
+
+
+def _normalize_caption_mode(value: str) -> str:
+    value = (value or "").strip().lower()
+
+    if value not in VALID_CAPTION_MODES:
+        return CAPTION_DEFAULTS["caption_mode"]
+
+    return value
 
 
 def _parse_chat_ids(

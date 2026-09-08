@@ -467,6 +467,97 @@
                         </span>
                       </div>
 
+                      <div class="caption-section">
+                        <div class="form-field full-width">
+                          <label for="route-caption-mode-{{ route._id }}">
+                            Caption
+                          </label>
+
+                          <select
+                            id="route-caption-mode-{{ route._id }}"
+                            name="caption_mode"
+                            data-caption-mode
+                          >
+                            <option
+                              value="original"
+                              {% if route.get('caption_mode', 'original') == 'original' %}selected{% endif %}
+                            >
+                              Original
+                            </option>
+                            <option
+                              value="filename"
+                              {% if route.get('caption_mode', 'original') == 'filename' %}selected{% endif %}
+                            >
+                              Filename
+                            </option>
+                            <option
+                              value="none"
+                              {% if route.get('caption_mode', 'original') == 'none' %}selected{% endif %}
+                            >
+                              None
+                            </option>
+                          </select>
+
+                          <span class="field-help">
+                            Choose what caption is sent with forwarded media.
+                          </span>
+                        </div>
+
+                        <div
+                          class="caption-filename-options"
+                          data-caption-filename-options
+                          {% if route.get('caption_mode', 'original') != 'filename' %}hidden{% endif %}
+                        >
+                          <div class="form-field checkbox-field">
+                            <label for="route-clean-filename-{{ route._id }}">
+                              <input
+                                type="checkbox"
+                                id="route-clean-filename-{{ route._id }}"
+                                name="clean_filename"
+                                {% if route.get('clean_filename', False) %}checked{% endif %}
+                              />
+                              Clean filename
+                            </label>
+
+                            <span class="field-help">
+                              Replace dots/underscores with spaces and tidy
+                              extra spacing.
+                            </span>
+                          </div>
+
+                          <div class="form-field">
+                            <label for="route-remove-text-{{ route._id }}">
+                              Remove text
+                            </label>
+
+                            <input
+                              type="text"
+                              id="route-remove-text-{{ route._id }}"
+                              name="remove_text"
+                              value="{{ route.get('remove_text', '') }}"
+                              placeholder="e.g. kaka"
+                            />
+
+                            <span class="field-help">
+                              Case-insensitive text to strip from the
+                              filename.
+                            </span>
+                          </div>
+
+                          <div class="form-field checkbox-field">
+                            <label for="route-keep-extension-{{ route._id }}">
+                              <input
+                                type="checkbox"
+                                id="route-keep-extension-{{ route._id }}"
+                                name="keep_extension"
+                                {% if route.get('keep_extension', False) %}checked{% endif %}
+                              />
+                              Keep file extension
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
                       <div class="editor-actions">
                         <button type="submit" class="primary-button">
                           Save changes
@@ -605,6 +696,74 @@
                 </span>
               </div>
 
+              <div class="caption-section">
+                <div class="form-field full-width">
+                  <label for="new-route-caption-mode"> Caption </label>
+
+                  <select
+                    id="new-route-caption-mode"
+                    name="caption_mode"
+                    data-caption-mode
+                  >
+                    <option value="original" selected>Original</option>
+                    <option value="filename">Filename</option>
+                    <option value="none">None</option>
+                  </select>
+
+                  <span class="field-help">
+                    Choose what caption is sent with forwarded media.
+                  </span>
+                </div>
+
+                <div
+                  class="caption-filename-options"
+                  data-caption-filename-options
+                  hidden
+                >
+                  <div class="form-field checkbox-field">
+                    <label for="new-route-clean-filename">
+                      <input
+                        type="checkbox"
+                        id="new-route-clean-filename"
+                        name="clean_filename"
+                      />
+                      Clean filename
+                    </label>
+
+                    <span class="field-help">
+                      Replace dots/underscores with spaces and tidy extra
+                      spacing.
+                    </span>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="new-route-remove-text"> Remove text </label>
+
+                    <input
+                      type="text"
+                      id="new-route-remove-text"
+                      name="remove_text"
+                      placeholder="e.g. kaka"
+                    />
+
+                    <span class="field-help">
+                      Case-insensitive text to strip from the filename.
+                    </span>
+                  </div>
+
+                  <div class="form-field checkbox-field">
+                    <label for="new-route-keep-extension">
+                      <input
+                        type="checkbox"
+                        id="new-route-keep-extension"
+                        name="keep_extension"
+                      />
+                      Keep file extension
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               <div class="create-form-footer">
                 <div class="security-note">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -636,5 +795,25 @@
         </div>
       </main>
     </div>
+
+    <script>
+      document.querySelectorAll(".route-form").forEach(function (form) {
+        var modeSelect = form.querySelector("[data-caption-mode]");
+        var filenameOptions = form.querySelector(
+          "[data-caption-filename-options]"
+        );
+
+        if (!modeSelect || !filenameOptions) {
+          return;
+        }
+
+        var syncCaptionOptions = function () {
+          filenameOptions.hidden = modeSelect.value !== "filename";
+        };
+
+        modeSelect.addEventListener("change", syncCaptionOptions);
+        syncCaptionOptions();
+      });
+    </script>
   </body>
 </html>
