@@ -9,7 +9,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 CAPTION_DEFAULTS = {
     "caption_mode": "original",
     "clean_filename": False,
-    "remove_text": "",
+    "remove_texts": [],
     "keep_extension": False,
 }
 
@@ -134,7 +134,7 @@ class Database:
         delay_seconds: int,
         caption_mode: str = CAPTION_DEFAULTS["caption_mode"],
         clean_filename: bool = CAPTION_DEFAULTS["clean_filename"],
-        remove_text: str = CAPTION_DEFAULTS["remove_text"],
+        remove_texts: list[str] = CAPTION_DEFAULTS["remove_texts"],
         keep_extension: bool = CAPTION_DEFAULTS["keep_extension"],
     ) -> str:
         now = datetime.now(timezone.utc)
@@ -150,7 +150,7 @@ class Database:
             "delay_seconds": delay_seconds,
             "caption_mode": caption_mode,
             "clean_filename": clean_filename,
-            "remove_text": remove_text,
+            "remove_texts": remove_texts,
             "keep_extension": keep_extension,
             "enabled": True,
             "created_at": now,
@@ -171,7 +171,7 @@ class Database:
         enabled: bool,
         caption_mode: str = CAPTION_DEFAULTS["caption_mode"],
         clean_filename: bool = CAPTION_DEFAULTS["clean_filename"],
-        remove_text: str = CAPTION_DEFAULTS["remove_text"],
+        remove_texts: list[str] = CAPTION_DEFAULTS["remove_texts"],
         keep_extension: bool = CAPTION_DEFAULTS["keep_extension"],
     ) -> bool:
         result = await self.routes.update_one(
@@ -189,7 +189,7 @@ class Database:
                     "enabled": enabled,
                     "caption_mode": caption_mode,
                     "clean_filename": clean_filename,
-                    "remove_text": remove_text,
+                    "remove_text": remove_texts,
                     "keep_extension": keep_extension,
                     "updated_at": datetime.now(timezone.utc),
                 }

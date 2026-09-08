@@ -60,9 +60,7 @@ def create_router(
         return request.app.state.templates.TemplateResponse(
             request=request,
             name="login.html",
-            context={
-                "error": "Invalid username or password"
-            },
+            context={"error": "Invalid username or password"},
             status_code=401,
         )
 
@@ -95,7 +93,7 @@ def create_router(
         delay_seconds: int = Form(0),
         caption_mode: str = Form(CAPTION_DEFAULTS["caption_mode"]),
         clean_filename: bool = Form(CAPTION_DEFAULTS["clean_filename"]),
-        remove_text: str = Form(CAPTION_DEFAULTS["remove_text"]),
+        remove_texts: list[str] = Form([]),
         keep_extension: bool = Form(CAPTION_DEFAULTS["keep_extension"]),
     ):
         redirect = require_auth(request)
@@ -124,7 +122,7 @@ def create_router(
             delay_seconds=delay_seconds,
             caption_mode=caption_mode,
             clean_filename=clean_filename,
-            remove_text=remove_text.strip(),
+            remove_texts=[text.strip() for text in remove_texts if text.strip()],
             keep_extension=keep_extension,
         )
 
@@ -133,9 +131,7 @@ def create_router(
             status_code=303,
         )
 
-    @router.post(
-        "/routes/{route_id}/update"
-    )
+    @router.post("/routes/{route_id}/update")
     async def update_route(
         request: Request,
         route_id: str,
@@ -145,7 +141,7 @@ def create_router(
         delay_seconds: int = Form(0),
         caption_mode: str = Form(CAPTION_DEFAULTS["caption_mode"]),
         clean_filename: bool = Form(CAPTION_DEFAULTS["clean_filename"]),
-        remove_text: str = Form(CAPTION_DEFAULTS["remove_text"]),
+        remove_texts: list[str] = Form([]),
         keep_extension: bool = Form(CAPTION_DEFAULTS["keep_extension"]),
     ):
         redirect = require_auth(request)
@@ -170,11 +166,7 @@ def create_router(
         routes = await database.get_routes()
 
         route = next(
-            (
-                route
-                for route in routes
-                if route["_id"] == route_id
-            ),
+            (route for route in routes if route["_id"] == route_id),
             None,
         )
 
@@ -188,7 +180,7 @@ def create_router(
                 enabled=route["enabled"],
                 caption_mode=caption_mode,
                 clean_filename=clean_filename,
-                remove_text=remove_text.strip(),
+                remove_texts=[text.strip() for text in remove_texts if text.strip()],
                 keep_extension=keep_extension,
             )
 
@@ -197,9 +189,7 @@ def create_router(
             status_code=303,
         )
 
-    @router.post(
-        "/routes/{route_id}/delete"
-    )
+    @router.post("/routes/{route_id}/delete")
     async def delete_route(
         request: Request,
         route_id: str,
@@ -216,9 +206,7 @@ def create_router(
             status_code=303,
         )
 
-    @router.post(
-        "/routes/{route_id}/toggle"
-    )
+    @router.post("/routes/{route_id}/toggle")
     async def toggle_route(
         request: Request,
         route_id: str,
@@ -231,11 +219,7 @@ def create_router(
         routes = await database.get_routes()
 
         route = next(
-            (
-                route
-                for route in routes
-                if route["_id"] == route_id
-            ),
+            (route for route in routes if route["_id"] == route_id),
             None,
         )
 
@@ -258,10 +242,7 @@ def create_router(
                     "clean_filename",
                     CAPTION_DEFAULTS["clean_filename"],
                 ),
-                remove_text=route.get(
-                    "remove_text",
-                    CAPTION_DEFAULTS["remove_text"],
-                ),
+                remove_texts=route.get("remove_texts", []),
                 keep_extension=route.get(
                     "keep_extension",
                     CAPTION_DEFAULTS["keep_extension"],

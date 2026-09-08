@@ -75,13 +75,18 @@ def _strip_extension(text: str, original_extension: str) -> str:
 
 
 def _build_filename_caption(filename: str, route) -> str:
-    remove_text = route.get("remove_text") or ""
+    remove_texts = route.get("remove_texts")
+    if remove_texts is None:
+        remove_texts = [route.get("remove_text", "")]
+
+    remove_texts = [text for text in remove_texts if text]
     clean_filename = route.get("clean_filename", False)
     keep_extension = route.get("keep_extension", False)
 
     stem, extension = os.path.splitext(filename)
 
-    stem = _strip_text_case_insensitive(stem, remove_text)
+    for remove_text in remove_texts:
+        stem = _strip_text_case_insensitive(stem, remove_text)
 
     if clean_filename:
         stem = _clean_filename_text(stem)

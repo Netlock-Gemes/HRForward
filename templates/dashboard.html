@@ -528,15 +528,31 @@
                           <div class="form-field">
                             <label for="route-remove-text-{{ route._id }}">
                               Remove text
-                            </label>
-
-                            <input
-                              type="text"
-                              id="route-remove-text-{{ route._id }}"
-                              name="remove_text"
-                              value="{{ route.get('remove_text', '') }}"
-                              placeholder="e.g. kaka"
-                            />
+                            </label>                 
+                            <div class="remove-text-list" data-remove-text-list>
+                              {% set remove_texts = route.get('remove_texts') %}
+                              {% if remove_texts is none %}
+                                {% set remove_texts = [route.get('remove_text', '')] %}
+                              {% endif %}
+                            
+                              {% for text in remove_texts %}
+                                <div class="remove-text-row">
+                                  <input
+                                    type="text"
+                                    name="remove_texts"
+                                    value="{{ text }}"
+                                    placeholder="e.g. moviesmod"
+                                  />
+                                  <button type="button" class="remove-text-button" data-remove-text>
+                                    −
+                                  </button>
+                                </div>
+                              {% endfor %}
+                              
+                              <button type="button" class="secondary-button" data-add-remove-text>
+                                + Add another
+                              </button>
+                            </div>
 
                             <span class="field-help">
                               Case-insensitive text to strip from the
@@ -737,15 +753,25 @@
                   </div>
 
                   <div class="form-field">
-                    <label for="new-route-remove-text"> Remove text </label>
-
-                    <input
-                      type="text"
-                      id="new-route-remove-text"
-                      name="remove_text"
-                      placeholder="e.g. kaka"
-                    />
-
+                    <label>Remove text</label>
+                                    
+                    <div class="remove-text-list" data-remove-text-list>
+                      <div class="remove-text-row">
+                        <input
+                          type="text"
+                          name="remove_texts"
+                          placeholder="e.g. moviesmod"
+                        />
+                        <button type="button" class="remove-text-button" data-remove-text>
+                          −
+                        </button>
+                      </div>
+                    
+                      <button type="button" class="secondary-button" data-add-remove-text>
+                        + Add another
+                      </button>
+                    </div>
+                  
                     <span class="field-help">
                       Case-insensitive text to strip from the filename.
                     </span>
@@ -813,6 +839,33 @@
 
         modeSelect.addEventListener("change", syncCaptionOptions);
         syncCaptionOptions();
+      });
+
+      document.querySelectorAll("[data-remove-text-list]").forEach(function (list) {
+        var addButton = list.querySelector("[data-add-remove-text]");
+
+        addButton.addEventListener("click", function () {
+          var row = document.createElement("div");
+          row.className = "remove-text-row";
+          row.innerHTML = `
+            <input type="text" name="remove_texts" placeholder="e.g. moviesmod">
+            <button type="button" class="remove-text-button" data-remove-text>−</button>
+          `;
+          list.insertBefore(row, addButton);
+        });
+      
+        list.addEventListener("click", function (event) {
+          var button = event.target.closest("[data-remove-text]");
+          if (!button) return;
+        
+          var rows = list.querySelectorAll(".remove-text-row");
+        
+          if (rows.length > 1) {
+            button.closest(".remove-text-row").remove();
+          } else {
+            button.closest(".remove-text-row").querySelector("input").value = "";
+          }
+        });
       });
     </script>
   </body>
