@@ -189,7 +189,7 @@ class Database:
                     "enabled": enabled,
                     "caption_mode": caption_mode,
                     "clean_filename": clean_filename,
-                    "remove_text": remove_texts,
+                    "remove_texts": remove_texts,
                     "keep_extension": keep_extension,
                     "updated_at": datetime.now(timezone.utc),
                 }

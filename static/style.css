@@ -582,7 +582,7 @@ h4 {
 /* ---------- Secondary ---------- */
 
 .secondary-button {
-  min-height: 40px;
+  min-height: 34px;
 
   display: inline-flex;
   align-items: center;
