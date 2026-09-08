@@ -50,7 +50,6 @@ def _clean_filename_text(text: str) -> str:
     # Replace separators with spaces, then collapse/trim whitespace.
     # Hyphens and other meaningful characters are left untouched.
     cleaned = text.replace(".", " ").replace("_", " ")
-
     return " ".join(cleaned.split())
 
 
@@ -75,25 +74,22 @@ def _strip_extension(text: str, original_extension: str) -> str:
     return text
 
 
-def _build_filename_caption(
-    filename: str,
-    route,
-) -> str:
+def _build_filename_caption(filename: str, route) -> str:
     remove_text = route.get("remove_text") or ""
     clean_filename = route.get("clean_filename", False)
     keep_extension = route.get("keep_extension", False)
 
-    _, extension = os.path.splitext(filename)
+    stem, extension = os.path.splitext(filename)
 
-    caption = _strip_text_case_insensitive(filename, remove_text)
+    stem = _strip_text_case_insensitive(stem, remove_text)
 
     if clean_filename:
-        caption = _clean_filename_text(caption)
+        stem = _clean_filename_text(stem)
 
-    if not keep_extension:
-        caption = _strip_extension(caption, extension)
+    if keep_extension:
+        return f"{stem.strip()}{extension}"
 
-    return caption.strip()
+    return stem.strip()
 
 
 def _build_caption(
